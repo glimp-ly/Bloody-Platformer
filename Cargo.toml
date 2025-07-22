@@ -1,0 +1,9 @@
+[package]
+name = "bloody-platformer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.13.2"           # el motor de videojuegos
+bevy_rapier2d = "0.25.0"  # para fisicas
+rand = "0.8"            # para random

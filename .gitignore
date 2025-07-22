@@ -1,0 +1,7 @@
+/target
+/.vscode
+/target
+**/*.rs.bk
+Cargo.lock
+/bin
+/go-backend/bin
