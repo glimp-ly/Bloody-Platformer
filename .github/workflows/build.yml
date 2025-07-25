@@ -16,6 +16,9 @@ jobs:
 
     - name: Install ALSA development libraries
       run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+
+    - name: Install libudev development libraries
+      run: sudo apt-get update && sudo apt-get install -y libudev-dev
     
     # Setup Rust
     - name: Install Rust toolchain
