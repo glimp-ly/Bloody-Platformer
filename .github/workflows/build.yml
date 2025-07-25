@@ -14,6 +14,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install ALSA development libraries
+      run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+    
     # Setup Rust
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
