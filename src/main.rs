@@ -15,13 +15,20 @@ fn main() {
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
         ))
         .add_systems(Startup, setup_game)
-        .add_systems(Update, (player_movement, exit_on_esc, apply_gravity, ground_detection))
+        .add_systems(Update, (player_movement, exit_on_esc, apply_gravity, ground_detection, enemy_movement))
         .run();
 }
 
 // Componentes
 #[derive(Component)]
 struct Player {
+    jump_power: f32,
+    move_speed: f32,
+    is_grounded: bool,
+}
+
+#[derive(Component)]
+struct Enemy {
     jump_power: f32,
     move_speed: f32,
     is_grounded: bool,
@@ -61,6 +68,29 @@ fn setup_game(mut commands: Commands) {
         Gravity(-9.8 * 100.0), // Gravedad personalizada
     ));
 
+    //Enemigo
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(Vec2::new(40.0, 40.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(10.0, 0.0, 0.0),
+            ..default()
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(20.0, 20.0),
+        Velocity::zero(),
+        GravityScale(0.0),
+        Enemy{
+            jump_power: 500.0,
+            move_speed: 250.0,
+            is_grounded: false,
+        },
+        Gravity(-10.0 * 100.0),
+    ));
+
     // Piso
     commands.spawn((
         SpriteBundle {
@@ -76,6 +106,25 @@ fn setup_game(mut commands: Commands) {
         Collider::cuboid(500.0, 10.0),
         Ground, // Marcamos como suelo
     ));
+}
+
+// Sistema de movimiento para el enemigo
+fn enemy_movement(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&mut Velocity, &mut Transform, &mut Enemy)>,    
+) {
+        for (mut velocity, mut transform, mut enemy) in &mut query {
+        let mut direction_x = 0.0;
+        let mut jump = false;
+
+        if keyboard_input.pressed(KeyCode::KeyH) || keyboard_input.pressed(KeyCode::Enter) {
+            direction_x -= 210.0;
+            transform.rotation = Quat::from_rotation_z(std::f32::consts::FRAC_PI_4);
+        }
+        if direction_x == 0.0 {
+            transform.rotation = Quat::IDENTITY;
+        }
+    }
 }
 
 // Sistema de movimiento mejorado
