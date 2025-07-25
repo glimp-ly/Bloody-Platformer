@@ -1,0 +1,44 @@
+name: Build Rust (Bevy) and Go
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Setup Rust
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Build Rust project
+      run: cargo build --release
+
+    # Setup Go
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Build Go project
+      run: |
+        cd go-backend
+        go build ./...
+
+    - name: Run Rust tests
+      run: cargo test
+
+    - name: Run Go tests
+      run: |
+        cd go-backend
+        go test ./...
