@@ -15,7 +15,7 @@ fn main() {
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
         ))
         .add_systems(Startup, setup_game)
-        .add_systems(Update, (player_movement, exit_on_esc, apply_gravity, ground_detection, enemy_movement))
+        .add_systems(Update, (player_movement, exit_on_esc, apply_gravity, ground_detection_player, enemy_movement, ground_detection_enemy))
         .run();
 }
 
@@ -61,7 +61,7 @@ fn setup_game(mut commands: Commands) {
         Velocity::zero(),
         GravityScale(0.0), // Desactivamos la gravedad de Rapier
         Player {
-            jump_power: 400.0,
+            jump_power: 650.0,
             move_speed: 200.0,
             is_grounded: false,
         },
@@ -72,7 +72,7 @@ fn setup_game(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::GREEN,
+                color: Color::BLUE,
                 custom_size: Some(Vec2::new(40.0, 40.0)),
                 ..default()
             },
@@ -106,6 +106,36 @@ fn setup_game(mut commands: Commands) {
         Collider::cuboid(500.0, 10.0),
         Ground, // Marcamos como suelo
     ));
+
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(Vec2::new(100.0, 20.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(-100.0, -100.0, 0.0),
+            ..default()
+        },
+        RigidBody::Fixed,
+        Collider::cuboid(50.0, 10.0),
+        Ground, // Marcamos como suelo
+    ));
+
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(Vec2::new(20.0, 20.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(100.0, 0.0, 0.0),
+            ..default()
+        },
+        RigidBody::Fixed,
+        Collider::cuboid(10.0, 10.0),
+        Ground, // Marcamos como suelo
+    ));
 }
 
 // Sistema de movimiento para el enemigo
@@ -124,6 +154,9 @@ fn enemy_movement(
         if direction_x == 0.0 {
             transform.rotation = Quat::IDENTITY;
         }
+
+        // Movimiento horizontal
+        velocity.linvel.x = direction_x * enemy.move_speed;
     }
 }
 
@@ -174,7 +207,7 @@ fn apply_gravity(
 }
 
 // Detectar colisión con el suelo
-fn ground_detection(
+fn ground_detection_player(
     mut player_query: Query<(&mut Player, &Transform), Without<Ground>>,
     ground_query: Query<&Transform, With<Ground>>,
 ) {
@@ -189,6 +222,23 @@ fn ground_detection(
             }
         }
     }
+}
+
+fn ground_detection_enemy(
+    mut enemy_query: Query<(&mut Enemy, &Transform), Without<Ground>>,
+    ground_query: Query<&Transform, With<Ground>>,
+) {
+   for (mut enemy, enemy_transform) in &mut enemy_query {
+        enemy.is_grounded = false;
+        for ground_transform in &ground_query {
+            if enemy_transform.translation.y - 15.0 <= ground_transform.translation.y + 10.0 &&
+               enemy_transform.translation.x.abs() < ground_transform.translation.x.abs() + 500.0
+            {
+                enemy.is_grounded = true;
+                break;
+            }
+        }
+    } 
 }
 
 // Salir con ESC
