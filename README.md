@@ -2,6 +2,8 @@
 
 > Action platformer roguelite desarrollado con Rust (Bevy) y Go
 
+> On hiatus due to other projects
+
 ![Gameplay screenshot](Pendiente)
 
 ## Características
