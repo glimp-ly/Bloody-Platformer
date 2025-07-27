@@ -41,23 +41,27 @@ struct Gravity(f32);
 struct Ground;
 
 // Configuración inicial
-fn setup_game(mut commands: Commands) {
+fn setup_game(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>, // Para cargar la imagen
+) {
     // Cámara
     commands.spawn(Camera2dBundle::default());
     
     // Jugador
     commands.spawn((
         SpriteBundle {
+            texture: asset_server.load("textures/dio_player.png"), // Ruta a asset
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             sprite: Sprite {
-                color: Color::RED,
-                custom_size: Some(Vec2::new(30.0, 30.0)),
+                custom_size: Some(Vec2::new(80.0, 80.0)), // Opcional: ajustar tamaño
+                color: Color::WHITE, // Usa WHITE para mantener colores originales
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         },
         RigidBody::Dynamic,
-        Collider::cuboid(15.0, 15.0),
+        Collider::cuboid(40.0, 40.0),
         Velocity::zero(),
         GravityScale(0.0), // Desactivamos la gravedad de Rapier
         Player {
