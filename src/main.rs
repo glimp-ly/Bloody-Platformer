@@ -136,6 +136,21 @@ fn setup_game(mut commands: Commands) {
         Collider::cuboid(10.0, 10.0),
         Ground, // Marcamos como suelo
     ));
+
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(Vec2::new(20.0, 20.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(100.0, 0.0, 0.0),
+            ..default()
+        },
+        RigidBody::Fixed,
+        Collider::cuboid(10.0, 10.0),
+        Ground, // Marcamos como suelo
+    ));
 }
 
 // Sistema de movimiento para el enemigo
